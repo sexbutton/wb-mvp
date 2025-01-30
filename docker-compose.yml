@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:13
+    container_name: test-btlz-postgres-1
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: wb_mvp_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U youruser -d wb_mvp_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: test-btlz-app-1
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_USER: youruser
+      DB_PASS: yourpassword
+      DB_NAME: wb_mvp_db
+    ports:
+      - "3000:3000"
+volumes:
+  postgres_data:
